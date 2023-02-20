@@ -1,0 +1,423 @@
+---
+title: ""
+output: html_document
+
+params:
+  axis: NA
+  bayes: NA
+  bugsnetdt: NA
+  data: NA
+  excluded: NA
+  exclusionbox: NA
+  forest: NA
+  freq_all: NA
+  freq_sub: NA
+  label: NA
+  metaoutcome: NA
+  modelranfix: NA
+  netgraph_label: NA
+  outcome_measure: NA
+  ranking: NA
+  reference_alter: NA
+---
+
+```{r include = FALSE}
+library(kableExtra)
+library(knitr)
+```
+## MetaInsight Report {.tabset}
+
+### User inputs and selections {.tabset}
+
+#### User selections
+
+```{r echo = FALSE}
+if (params$metaoutcome == "Continuous") {outcome_type_txt <- "Continuous (mean difference)"
+} else {outcome_type_txt <- "Binary (odds ratio)"}
+
+if (params$outcome_measure == "MD") {outcome_measure_txt <- "Mean difference"
+} else if (params$outcome_measure == "SMD") {outcome_measure_txt <- "Standardised mean difference"
+} else if (params$outcome_measure == "OR") {outcome_measure_txt <- "Odds ratio"
+} else if (params$outcome_measure == "RR") {outcome_measure_txt <- "Risk ratio"
+} else if (params$outcome_measure == "RD") {outcome_measure_txt <- "Risk difference"
+}
+
+if (params$ranking == "good") {ranking_txt <- "desirable"
+} else {ranking_txt <- "undesirable"}
+
+if (params$modelranfix == "random") {modelranfix_txt <- "Random effect"
+} else {modelranfix_txt <- "Fixed effect"}
+
+```
+
+**Outcome type:** `r outcome_type_txt`
+
+**Outcome measure:** `r outcome_measure_txt`
+
+For treatment rankings, smaller outcome values (e.g. smaller mean values for continuous data, or ORs less than 1 for binary data) are: **`r ranking_txt`**
+
+**Model:** `r modelranfix_txt`
+
+**Excluded studies: ** `r paste(params$excluded, collapse = (", "))`
+
+#### Study data 
+
+```{r echo = FALSE}
+knitr::kable(params$data)
+```
+
+#### Treatment labels
+
+```{r echo = FALSE}
+kableExtra::kable(treatment_label(params$label))
+```
+
+
+### 1. Data summary {.tabset}
+
+#### 1a. Data characteristics
+
+This tab shows a summary of study characteristics
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
+
+::: {}
+
+**Characteristics table of all studies**
+
+```{r echo = FALSE}
+kableExtra::kable(summary_table_plot(params$bugsnetdt, params$metaoutcome))
+```
+
+:::
+
+::: {}
+
+**Characteristics table with studies excluded**
+
+```{r echo = FALSE}
+kableExtra::kable(summary_table_plot(filter(params$bugsnetdt, !Study %in% params$exclusionbox), params$metaoutcome))
+```
+
+:::
+
+::::
+
+#### 1b. Study results  
+
+```{r echo = FALSE}
+make_netStudy(params$freq_sub, params$outcome_measure, params$forest$ForestHeader, params$forest$ForestTitle)
+```
+
+
+#### 1c. Network plot  
+
+:::: {style="display: flex;"}
+
+::: {}
+
+**Network plot of all studies**
+
+Number of trials shown on the line:
+
+```{r echo = FALSE}
+make_netgraph(params$freq_all, params$netgraph_label$label_all)
+```
+
+Number of trials indicated by node size and line thickness:
+
+```{r echo = FALSE}
+make_netplot(params$bugsnetdt, params$netgraph_label$label_all)
+```
+
+Network connectivity
+
+```{r echo = FALSE}
+make_netconnect(params$freq_all)
+```
+
+:::
+
+::: {}
+
+**Network plot with studies excluded**   
+
+Number of trials shown on the line:
+
+```{r echo = FALSE}
+make_netgraph(params$freq_sub, params$netgraph_label$label_excluded)
+```
+
+Number of trials indicated by node size and line thickness:
+
+```{r echo = FALSE}
+make_netplot(filter(params$bugsnetdt, !Study %in% params$exclusionbox), params$netgraph_label$label_all)
+```
+
+Network connectivity
+
+```{r echo = FALSE}
+make_netconnect(params$freq_sub)
+```
+
+:::
+
+::::
+
+### 2. Frequentist network meta-analysis {.tabset}
+
+
+#### 2a. Forest plot 
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
+
+::: {}
+
+**Results for all studies**
+
+```{r echo = FALSE}
+make_netComp(params$freq_all, params$modelranfix, params$reference_alter$ref_all, params$axis$freqmin, params$axis$freqmax)
+
+text <- texttau(params$freq_all, params$outcome_measure, params$modelranfix)
+
+ref_text <- make_refText(params$reference_alter$ref_all)
+```
+
+`r text`
+
+`r ref_text`
+
+:::
+
+::: {}
+
+**Results with studies excluded**
+
+```{r echo = FALSE}
+make_netComp(params$freq_sub, params$modelranfix, params$reference_alter$ref_sub, params$axis$freqmin_sub, params$axis$freqmax_sub)
+
+text <- texttau(params$freq_sub, params$outcome_measure, params$modelranfix)
+
+ref_text <- make_refText(params$reference_alter$ref_sub)
+```
+
+`r text`
+
+`r ref_text`
+
+:::
+
+::::
+
+#### 2b. Comparison of all treatment pairs
+
+Treatments are ranked from best to worst along the leading diagonal. Above the leading diagonal are estimates from pairwise meta-analyses, below the leading diagonal are estimates from network meta-analyses.
+
+**Relative treatment effects in ranked order for all studies**
+
+```{r echo = FALSE}
+make_netrank(params$freq_all, params$modelranfix, params$ranking)
+```
+
+**Relative treatment effects in ranked order with studies excluded**
+
+```{r echo = FALSE}
+make_netrank(params$freq_sub, params$modelranfix, params$ranking)
+```
+
+
+#### 2c. Inconsistency
+
+**Assessment of inconsistency for all studies**
+
+```{r echo = FALSE}
+kableExtra::kable(make_Incon(params$freq_all, params$modelranfix))
+```
+
+**Assessment of inconsistency with studies removed**
+
+```{r echo = FALSE}
+kableExtra::kable(make_Incon(params$freq_sub, params$modelranfix))
+```
+
+### 3. Bayesian Network Meta-analysis {.tabset}
+
+#### 3a. Forest plot 
+
+```{r echo=FALSE}
+if (is.NULL(params$bayes$model)) {eval_bayes <- FALSE
+} else {eval_bayes <- TRUE}
+```
+
+**Forest plot for all studies**
+
+```{r eval = eval_bayes}
+make_Forest(params$bayes$model, params$metaoutcome, params$bayes$bayesmin, params$bayes$bayesmax)
+```
+
+DIC table 
+
+```{r eval = eval_bayes}
+knitr::kable(params$bayes$model$dic, digits=3)
+
+gemtctau(params$bayes$model, params$outcome_measure)
+```
+
+
+**Forest plot with studies excluded**
+
+```{r eval = eval_bayes}
+make_Forest(params$bayes$model_sub, params$metaoutcome, params$bayes$bayesmin_sub, params$bayes$bayesmax_sub)
+```
+
+DIC table 
+
+```{r eval = eval_bayes}
+knitr::kable(params$bayes$model_sub$dic, digits=3)
+
+gemtctau(params$bayes$model_sub, params$outcome_measure)
+
+```
+
+<!-- #### 3b. Comparison of all treatment pairs -->
+
+<!-- **Treatment effects for all studies: comparison of all treatment pairs** -->
+
+<!-- ```{r } -->
+<!-- baye_comp(params$bayes$model, params$metaoutcome, params$outcome_measure) -->
+<!-- ``` -->
+
+<!-- **Treatment effects with studies excluded: comparison of all treatment pairs** -->
+
+<!-- ```{r} -->
+<!-- baye_comp(params$bayes$model_sub, params$metaoutcome, params$outcome_measure) -->
+<!-- ``` -->
+
+<!-- #### 3c. Ranking table -->
+
+<!-- ```{r} -->
+<!-- knitr::kable(ranking_chart(sub = FALSE, params$bayes$model, params$ranking)) -->
+<!-- ``` -->
+
+<!-- **Ranking table for all studies - Probability for each treatment to be the best** -->
+
+<!-- ```{r} -->
+<!-- knitr::kable(ranking_table(params$bayes$model, params$ranking), digits = 5) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- knitr::kable(ranking_chart(sub = TRUE, params$bayes$model_sub, params$ranking)) -->
+<!-- ``` -->
+
+<!-- **Ranking table with studies excluded - Probability for each treatment to be the best** -->
+
+<!-- ```{r} -->
+<!-- knitr::kable(ranking_table(params$bayes$model_sub, params$ranking), digits = 5) -->
+<!-- ``` -->
+
+<!-- #### 3d. Nodesplit model -->
+
+<!-- #### 3e. Bayesian result details -->
+
+<!-- **Results details for all studies** -->
+
+<!-- ```{r} -->
+<!-- params$bayes$model$sumresults -->
+<!-- ``` -->
+
+<!-- **Gelman convergence assessment plot for all studies** -->
+
+<!-- ```{r} -->
+<!-- gelman.plot(params$bayes$model$mtcResults) -->
+<!-- ``` -->
+
+<!-- **Results details with studies excluded** -->
+
+<!-- ```{r} -->
+<!-- params$bayes$model_sub$sumresults -->
+<!-- ``` -->
+
+<!-- **Gelman convergence assessment plot with studies excluded** -->
+
+<!-- ```{r} -->
+<!-- gelman.plot(params$bayes$model_sub$mtcResults) -->
+<!-- ``` -->
+
+<!-- #### 3f. Deviance report -->
+
+<!-- **Residual deviance from NMA model and UME inconsistency model for all studies** -->
+
+<!-- ```{r} -->
+<!-- scat_plot(params$bayes$model)$p -->
+<!-- ``` -->
+
+<!-- **Residual deviance from NMA model and UME inconsistency model with studies excluded** -->
+
+<!-- ```{r} -->
+<!-- scat_plot(params$bayes$model_sub)$p -->
+<!-- ``` -->
+
+<!-- **Per-arm residual deviance for all studies** -->
+
+<!-- ```{r} -->
+<!-- stemplot(params$bayes$model) -->
+<!-- ``` -->
+
+<!-- **Per-arm residual deviance for sensitivity analysis** -->
+
+<!-- ```{r} -->
+<!-- stemplot(params$bayes$model_sub) -->
+<!-- ``` -->
+
+<!-- **Leverage plot for all studies** -->
+
+<!-- ```{r} -->
+<!-- levplot(params$bayes$model) -->
+<!-- ``` -->
+
+<!-- **Leverage plot for sensitivity analysis** -->
+
+<!-- ```{r} -->
+<!-- levplot(params$bayes$model_sub) -->
+<!-- ``` -->
+
+<!-- #### 3g. Model details -->
+
+<!-- **3g-1 Model codes for analysis of all studies** -->
+
+<!-- ```{r} -->
+<!-- cat(params$bayesmodel$mtcResults$model$code, fill=FALSE, labels=NULL, append=FALSE) -->
+<!-- ``` -->
+
+<!-- **3g-2 Initial values**   -->
+
+<!-- ```{r} -->
+<!-- params$bayes$model$mtcResults$model$inits -->
+<!-- ``` -->
+
+<!-- **3g-4 Deviance details** -->
+
+<!-- NMA consistency model (all studies) -->
+<!-- ```{r} -->
+<!-- mtc.deviance({params$bayes$model$mtcResults}) -->
+<!-- ``` -->
+
+<!-- NMA consistency model  -->
+
+<!-- ```{r} -->
+<!-- mtc.deviance({params$bayes$model_sub$mtcResults}) -->
+<!-- ``` -->
+
+<!-- UME inconsistency model (all studies) -->
+<!-- ```{r} -->
+<!-- scat_plot(params$bayes$model)$y -->
+<!-- ``` -->
+
+<!-- UME inconsistency model (sensitivity) -->
+
+<!-- ```{r} -->
+<!-- scat_plot(params$bayes$model_sub)$y -->
+<!-- ``` -->
+
+
+
