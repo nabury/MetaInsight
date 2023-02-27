@@ -60,9 +60,10 @@ shinyServer(function(input, output, session) {
       # Set up parameters to pass to Rmd document
       params <- list(axis = list(freqmin = input$freqmin, freqmax = input$freqmax, 
                                  freqmin_sub = input$freqmin_sub, freqmax_sub = input$freqmax_sub),
-                     bayes = list(model = model(), model_sub = model_sub(),
-                                  bayesmax = input$bayesmax, bayesmin = input$bayesmin, 
-                                  bayesmax_sub = input$bayesmax_sub, bayesmin_sub = input$bayesmin_sub),
+                     bayes_model = model,
+                     # bayes = list(model = model(), model_sub = model_sub(),
+                     #              bayesmax = input$bayesmax, bayesmin = input$bayesmin, 
+                     #              bayesmax_sub = input$bayesmax_sub, bayesmin_sub = input$bayesmin_sub),
                      bugsnetdt = bugsnetdt(),
                      data = data(),
                      excluded = paste(input$exclusionbox, collapse = ", "),
@@ -599,6 +600,8 @@ shinyServer(function(input, output, session) {
   
   
   # Bayesian analysis
+  
+  model <- NA
   
   model <- eventReactive(input$baye_do, {
     bayesian_model(sub = FALSE, data(), treatment_list(), input$metaoutcome, input$exclusionbox,

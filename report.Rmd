@@ -4,7 +4,8 @@ output: html_document
 
 params:
   axis: NA
-  bayes: NA
+  bayes_model: NA
+  # bayes: NA
   bugsnetdt: NA
   data: NA
   excluded: NA
@@ -244,40 +245,44 @@ kableExtra::kable(make_Incon(params$freq_sub, params$modelranfix))
 
 #### 3a. Forest plot 
 
-```{r echo=FALSE}
-if (is.NULL(params$bayes$model)) {eval_bayes <- FALSE
-} else {eval_bayes <- TRUE}
-```
+<!-- # ```{r echo=FALSE} -->
+<!-- # if (is.null(params$bayes$model)) {eval_bayes <- FALSE -->
+<!-- # } else {eval_bayes <- TRUE} -->
+<!-- # ``` -->
 
 **Forest plot for all studies**
 
-```{r eval = eval_bayes}
-make_Forest(params$bayes$model, params$metaoutcome, params$bayes$bayesmin, params$bayes$bayesmax)
+```{r echo = FALSE}
+
+"Hello"
+
+# if (is.null(params$bayes$model)) {}
+# make_Forest(params$bayes$model, params$metaoutcome, params$bayes$bayesmin, params$bayes$bayesmax)
 ```
 
-DIC table 
+<!-- DIC table  -->
 
-```{r eval = eval_bayes}
-knitr::kable(params$bayes$model$dic, digits=3)
+<!-- ```{r eval = eval_bayes} -->
+<!-- knitr::kable(params$bayes$model$dic, digits=3) -->
 
-gemtctau(params$bayes$model, params$outcome_measure)
-```
+<!-- gemtctau(params$bayes$model, params$outcome_measure) -->
+<!-- ``` -->
 
 
-**Forest plot with studies excluded**
+<!-- **Forest plot with studies excluded** -->
 
-```{r eval = eval_bayes}
-make_Forest(params$bayes$model_sub, params$metaoutcome, params$bayes$bayesmin_sub, params$bayes$bayesmax_sub)
-```
+<!-- ```{r eval = eval_bayes} -->
+<!-- make_Forest(params$bayes$model_sub, params$metaoutcome, params$bayes$bayesmin_sub, params$bayes$bayesmax_sub) -->
+<!-- ``` -->
 
-DIC table 
+<!-- DIC table  -->
 
-```{r eval = eval_bayes}
-knitr::kable(params$bayes$model_sub$dic, digits=3)
+<!-- ```{r eval = eval_bayes} -->
+<!-- knitr::kable(params$bayes$model_sub$dic, digits=3) -->
 
-gemtctau(params$bayes$model_sub, params$outcome_measure)
+<!-- gemtctau(params$bayes$model_sub, params$outcome_measure) -->
 
-```
+<!-- ``` -->
 
 <!-- #### 3b. Comparison of all treatment pairs -->
 
