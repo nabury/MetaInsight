@@ -42,6 +42,49 @@ source("fn_analysis.R",local = TRUE)              # functions for NMA
 shinyServer(function(input, output, session) {
   source("downloadbuttons.R", local = TRUE)   #codes for download buttons for conciseness. This line must be put within the shinyserver as this is purely a code file not functions.
   
+  #####
+  # Report
+  # NVB
+  #####
+  
+  # Create Rmd report
+  output$report <- downloadHandler(
+    
+    filename = "MetaInsightReport.html",
+    content = function(file) {
+      
+      # Copy the report file to a temporary directory before processing it
+      tempReport <- file.path(tempdir(), "report.Rmd")
+      file.copy("report.Rmd", tempReport, overwrite = TRUE)
+      
+      # Set up parameters to pass to Rmd document
+      params <- list(axis = list(freqmin = input$freqmin, freqmax = input$freqmax, 
+                                 freqmin_sub = input$freqmin_sub, freqmax_sub = input$freqmax_sub),
+                     bayes = list(model = model(), model_sub = model_sub(),
+                                  bayesmax = input$bayesmax, bayesmin = input$bayesmin, 
+                                  bayesmax_sub = input$bayesmax_sub, bayesmin_sub = input$bayesmin_sub),
+                     bugsnetdt = bugsnetdt(),
+                     data = data(),
+                     excluded = paste(input$exclusionbox, collapse = ", "),
+                     exclusionbox = input$exclusionbox,
+                     forest = list(ForestHeader = input$ForestHeader, ForestTitle = input$ForestTitle),
+                     freq_all = freq_all(),
+                     freq_sub = freq_sub(),
+                     label = treatment_list(),
+                     metaoutcome = input$metaoutcome,
+                     modelranfix = input$modelranfix,
+                     netgraph_label = list(label_all = input$label_all, label_excluded = input$label_excluded),
+                     outcome_measure = outcome_measure(),
+                     ranking = input$rankopts,
+                     reference_alter = reference_alter())
+      
+      # Knit the document, passing in the `params` list, and eval it in a child of the global environment 
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+    }
+  )
   
   #####
   # Reactive functions used in various places
@@ -102,19 +145,19 @@ shinyServer(function(input, output, session) {
   ######### Home page - linking pages ########
   ############################################
   
-  ### GDPR
-
-    showModal(modalDialog(
-       title = "Important message",
-        easyClose = FALSE,
-        p(tags$strong("In accordance with Data Protection legislation, we would like to inform you of the following before you use our website:
-                                 "), "We collect your usage data within the MetaInsight app to perform analytics of usage and improve our app. By clicking",
-      tags$i(tags$u("I consent")), "below, you consent to the use of data by us through Google Analytics.
-          For details of policy, please check the 'Privacy notice' tab within the app, and ",tags$a(href="https://policies.google.com/privacy?hl=en", "Google Privacy & Terms.",target="_blank") ),
-        br(),
-        modalButton("I consent"),
-        footer = NULL
-      ))
+  # ### GDPR
+  # 
+  #   showModal(modalDialog(
+  #      title = "Important message",
+  #       easyClose = FALSE,
+  #       p(tags$strong("In accordance with Data Protection legislation, we would like to inform you of the following before you use our website:
+  #                                "), "We collect your usage data within the MetaInsight app to perform analytics of usage and improve our app. By clicking",
+  #     tags$i(tags$u("I consent")), "below, you consent to the use of data by us through Google Analytics.
+  #         For details of policy, please check the 'Privacy notice' tab within the app, and ",tags$a(href="https://policies.google.com/privacy?hl=en", "Google Privacy & Terms.",target="_blank") ),
+  #       br(),
+  #       modalButton("I consent"),
+  #       footer = NULL
+  #     ))
 
   ### View the full update history
   
