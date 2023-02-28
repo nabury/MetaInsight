@@ -4,8 +4,7 @@ output: html_document
 
 params:
   axis: NA
-  bayes_model: NA
-  # bayes: NA
+  bayes: NA
   bugsnetdt: NA
   data: NA
   excluded: NA
@@ -245,58 +244,68 @@ kableExtra::kable(make_Incon(params$freq_sub, params$modelranfix))
 
 #### 3a. Forest plot 
 
-<!-- # ```{r echo=FALSE} -->
-<!-- # if (is.null(params$bayes$model)) {eval_bayes <- FALSE -->
-<!-- # } else {eval_bayes <- TRUE} -->
-<!-- # ``` -->
+Bayesian result using the gemtc package. 
+Heterogeneity prior: standard deviation ~ U(0,X), where X represents a very large difference in the analysis' outcome scale and is determined from the data. 
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
+
+::: {}
 
 **Forest plot for all studies**
 
 ```{r echo = FALSE}
-
-"Hello"
-
-# if (is.null(params$bayes$model)) {}
-# make_Forest(params$bayes$model, params$metaoutcome, params$bayes$bayesmin, params$bayes$bayesmax)
+make_Forest(params$bayes$model, params$metaoutcome, params$bayes$bayesmin, params$bayes$bayesmax)
 ```
 
-<!-- DIC table  -->
+Model fit:
 
-<!-- ```{r eval = eval_bayes} -->
-<!-- knitr::kable(params$bayes$model$dic, digits=3) -->
+```{r echo = FALSE}
+kableExtra::kable(params$bayes$model$dic, digits=3)
 
-<!-- gemtctau(params$bayes$model, params$outcome_measure) -->
-<!-- ``` -->
+model_fit_text <- gemtctau(params$bayes$model, params$outcome_measure)
+```
 
 
-<!-- **Forest plot with studies excluded** -->
+`r model_fit_text`
 
-<!-- ```{r eval = eval_bayes} -->
-<!-- make_Forest(params$bayes$model_sub, params$metaoutcome, params$bayes$bayesmin_sub, params$bayes$bayesmax_sub) -->
-<!-- ``` -->
+:::
 
-<!-- DIC table  -->
+::: {}
 
-<!-- ```{r eval = eval_bayes} -->
-<!-- knitr::kable(params$bayes$model_sub$dic, digits=3) -->
+**Forest plot with studies excluded**
 
-<!-- gemtctau(params$bayes$model_sub, params$outcome_measure) -->
+```{r echo = FALSE}
+make_Forest(params$bayes$model_sub, params$metaoutcome, params$bayes$bayesmin_sub, params$bayes$bayesmax_sub)
+```
 
-<!-- ``` -->
+Model fit:
 
-<!-- #### 3b. Comparison of all treatment pairs -->
+```{r echo = FALSE}
+kableExtra::kable(params$bayes$model_sub$dic, digits=3)
 
-<!-- **Treatment effects for all studies: comparison of all treatment pairs** -->
+model_sub_text <- gemtctau(params$bayes$model_sub, params$outcome_measure)
+```
 
-<!-- ```{r } -->
-<!-- baye_comp(params$bayes$model, params$metaoutcome, params$outcome_measure) -->
-<!-- ``` -->
 
-<!-- **Treatment effects with studies excluded: comparison of all treatment pairs** -->
+`r model_sub_text`
+:::
 
-<!-- ```{r} -->
-<!-- baye_comp(params$bayes$model_sub, params$metaoutcome, params$outcome_measure) -->
-<!-- ``` -->
+::::
+
+#### 3b. Comparison of all treatment pairs
+
+**Treatment effects for all studies: comparison of all treatment pairs**
+
+```{r echo = FALSE}
+kableExtra::kable(baye_comp(params$bayes$model, params$metaoutcome, params$outcome_measure))
+```
+
+
+**Treatment effects with studies excluded: comparison of all treatment pairs**
+
+```{r echo = FALSE}
+kableExtra::kable(baye_comp(params$bayes$model_sub, params$metaoutcome, params$outcome_measure))
+```
 
 <!-- #### 3c. Ranking table -->
 
