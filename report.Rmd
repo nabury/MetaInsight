@@ -18,6 +18,8 @@ params:
   netgraph_label: NA
   outcome_measure: NA
   ranking: NA
+  RankingData: NA
+  RankingData_sub: NA
   reference_alter: NA
 ---
 
@@ -294,6 +296,8 @@ model_sub_text <- gemtctau(params$bayes$model_sub, params$outcome_measure)
 
 #### 3b. Comparison of all treatment pairs
 
+In contrast to the 'comparison of all treatment pairs' tab in the frequentist NMA results, this table only contains the estimates from the network meta analysis, i.e. does not contain estimates from pairwise meta-analysis which only contains direct evidence.
+
 **Treatment effects for all studies: comparison of all treatment pairs**
 
 ```{r echo = FALSE}
@@ -307,7 +311,31 @@ kableExtra::kable(baye_comp(params$bayes$model, params$metaoutcome, params$outco
 kableExtra::kable(baye_comp(params$bayes$model_sub, params$metaoutcome, params$outcome_measure))
 ```
 
-<!-- #### 3c. Ranking table -->
+#### 3c. Ranking panel
+
+**Litmus Rank-O-Gram for all studies**
+
+```{r echo = FALSE}
+LitmusRankOGram(CumData=params$RankingData$Cumulative, SUCRAData=params$RankingData$SUCRA, ColourData=params$RankingData$Colour, colourblind=FALSE)
+```
+
+**Radial SUCRA for all studies**
+
+```{r echo = FALSE, warning = FALSE}
+RadialSUCRA(SUCRAData=params$RankingData$SUCRA, ColourData=params$RankingData$Colour, BUGSnetData=params$RankingData$BUGSnetData, colourblind=FALSE)
+```
+
+**Litmus Rank-O-Gram with studies excluded**
+
+```{r echo = FALSE}
+LitmusRankOGram(CumData=params$RankingData_sub$Cumulative, SUCRAData=params$RankingData_sub$SUCRA, ColourData=params$RankingData_su$Colour, colourblind=FALSE)
+```
+
+**Radial SUCRA with studies excluded**
+
+```{r echo = FALSE, warning = FALSE}
+RadialSUCRA(SUCRAData=params$RankingData_sub$SUCRA, ColourData=params$RankingData_sub$Colour, BUGSnetData=params$RankingData_sub$BUGSnetData, colourblind=FALSE)
+```
 
 <!-- ```{r} -->
 <!-- knitr::kable(ranking_chart(sub = FALSE, params$bayes$model, params$ranking)) -->
