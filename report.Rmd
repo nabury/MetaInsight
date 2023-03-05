@@ -14,6 +14,8 @@ params:
   freq_sub: NA
   label: NA
   metaoutcome: NA
+  model_nodesplit: NA
+  model_nodesplit_sub: NA
   modelranfix: NA
   netgraph_label: NA
   outcome_measure: NA
@@ -337,129 +339,146 @@ LitmusRankOGram(CumData=params$RankingData_sub$Cumulative, SUCRAData=params$Rank
 RadialSUCRA(SUCRAData=params$RankingData_sub$SUCRA, ColourData=params$RankingData_sub$Colour, BUGSnetData=params$RankingData_sub$BUGSnetData, colourblind=FALSE)
 ```
 
-<!-- ```{r} -->
-<!-- knitr::kable(ranking_chart(sub = FALSE, params$bayes$model, params$ranking)) -->
-<!-- ``` -->
 
-<!-- **Ranking table for all studies - Probability for each treatment to be the best** -->
+#### 3d. Nodesplit model
 
-<!-- ```{r} -->
-<!-- knitr::kable(ranking_table(params$bayes$model, params$ranking), digits = 5) -->
-<!-- ``` -->
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
 
-<!-- ```{r} -->
-<!-- knitr::kable(ranking_chart(sub = TRUE, params$bayes$model_sub, params$ranking)) -->
-<!-- ``` -->
+::: {}
 
-<!-- **Ranking table with studies excluded - Probability for each treatment to be the best** -->
+**Inconsistency test with notesplitting model for all studies**
 
-<!-- ```{r} -->
-<!-- knitr::kable(ranking_table(params$bayes$model_sub, params$ranking), digits = 5) -->
-<!-- ``` -->
+```{r echo = FALSE}
+kableExtra::kable(params$model_nodesplit)
+```
 
-<!-- #### 3d. Nodesplit model -->
+:::
 
-<!-- #### 3e. Bayesian result details -->
+::: {}
 
-<!-- **Results details for all studies** -->
+**Inconsistency test with notesplitting model with studies excluded**
 
-<!-- ```{r} -->
-<!-- params$bayes$model$sumresults -->
-<!-- ``` -->
+```{r echo = FALSE}
+kableExtra::kable(params$model_nodesplit_sub)
+```
 
-<!-- **Gelman convergence assessment plot for all studies** -->
+:::
 
-<!-- ```{r} -->
-<!-- gelman.plot(params$bayes$model$mtcResults) -->
-<!-- ``` -->
+::::
 
-<!-- **Results details with studies excluded** -->
+#### 3e. Bayesian result details
 
-<!-- ```{r} -->
-<!-- params$bayes$model_sub$sumresults -->
-<!-- ``` -->
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
 
-<!-- **Gelman convergence assessment plot with studies excluded** -->
+::: {}
 
-<!-- ```{r} -->
-<!-- gelman.plot(params$bayes$model_sub$mtcResults) -->
-<!-- ``` -->
+**Results details for all studies**
 
-<!-- #### 3f. Deviance report -->
+```{r echo = FALSE}
+params$bayes$model$sumresults
+```
 
-<!-- **Residual deviance from NMA model and UME inconsistency model for all studies** -->
+**Gelman convergence assessment plot for all studies**
 
-<!-- ```{r} -->
-<!-- scat_plot(params$bayes$model)$p -->
-<!-- ``` -->
+```{r echo = FALSE}
+gelman.plot(params$bayes$model$mtcResults)
+```
 
-<!-- **Residual deviance from NMA model and UME inconsistency model with studies excluded** -->
+:::
 
-<!-- ```{r} -->
-<!-- scat_plot(params$bayes$model_sub)$p -->
-<!-- ``` -->
+::: {}
 
-<!-- **Per-arm residual deviance for all studies** -->
+**Results details with studies excluded**
 
-<!-- ```{r} -->
-<!-- stemplot(params$bayes$model) -->
-<!-- ``` -->
+```{r echo = FALSE}
+params$bayes$model_sub$sumresults
+```
 
-<!-- **Per-arm residual deviance for sensitivity analysis** -->
+**Gelman convergence assessment plot with studies excluded**
 
-<!-- ```{r} -->
-<!-- stemplot(params$bayes$model_sub) -->
-<!-- ``` -->
+```{r echo = FALSE}
+gelman.plot(params$bayes$model_sub$mtcResults)
+```
 
-<!-- **Leverage plot for all studies** -->
+:::
 
-<!-- ```{r} -->
-<!-- levplot(params$bayes$model) -->
-<!-- ``` -->
+::::
 
-<!-- **Leverage plot for sensitivity analysis** -->
+#### 3f. Deviance report
 
-<!-- ```{r} -->
-<!-- levplot(params$bayes$model_sub) -->
-<!-- ``` -->
+**Residual deviance from NMA model and UME inconsistency model for all studies**
 
-<!-- #### 3g. Model details -->
+```{r echo = FALSE, warning = FALSE}
+scat_plot(params$bayes$model)$p
+```
 
-<!-- **3g-1 Model codes for analysis of all studies** -->
+**Residual deviance from NMA model and UME inconsistency model with studies excluded**
 
-<!-- ```{r} -->
-<!-- cat(params$bayesmodel$mtcResults$model$code, fill=FALSE, labels=NULL, append=FALSE) -->
-<!-- ``` -->
+```{r echo = FALSE, warning = FALSE}
+scat_plot(params$bayes$model_sub)$p
+```
 
-<!-- **3g-2 Initial values**   -->
+**Per-arm residual deviance for all studies**
 
-<!-- ```{r} -->
-<!-- params$bayes$model$mtcResults$model$inits -->
-<!-- ``` -->
+```{r echo = FALSE, warning = FALSE}
+stemplot(params$bayes$model)
+```
 
-<!-- **3g-4 Deviance details** -->
+**Per-arm residual deviance for sensitivity analysis**
 
-<!-- NMA consistency model (all studies) -->
-<!-- ```{r} -->
-<!-- mtc.deviance({params$bayes$model$mtcResults}) -->
-<!-- ``` -->
+```{r echo = FALSE, warning = FALSE}
+stemplot(params$bayes$model_sub)
+```
 
-<!-- NMA consistency model  -->
+**Leverage plot for all studies**
 
-<!-- ```{r} -->
-<!-- mtc.deviance({params$bayes$model_sub$mtcResults}) -->
-<!-- ``` -->
+```{r echo = FALSE, warning = FALSE}
+levplot(params$bayes$model)
+```
 
-<!-- UME inconsistency model (all studies) -->
-<!-- ```{r} -->
-<!-- scat_plot(params$bayes$model)$y -->
-<!-- ``` -->
+**Leverage plot for sensitivity analysis**
 
-<!-- UME inconsistency model (sensitivity) -->
+```{r echo = FALSE, warning = FALSE}
+levplot(params$bayes$model_sub)
+```
 
-<!-- ```{r} -->
-<!-- scat_plot(params$bayes$model_sub)$y -->
-<!-- ``` -->
+#### 3g. Model details
+
+**3g-1 Model codes for analysis of all studies**
+
+```{r echo = FALSE}
+cat(params$bayesmodel$mtcResults$model$code, fill=FALSE, labels=NULL, append=FALSE)
+```
+
+**3g-2 Initial values**
+
+```{r echo = FALSE}
+params$bayes$model$mtcResults$model$inits
+```
+
+**3g-4 Deviance details**
+
+NMA consistency model (all studies)
+```{r echo = FALSE}
+mtc.deviance({params$bayes$model$mtcResults})
+```
+
+NMA consistency model
+
+```{r echo = FALSE}
+mtc.deviance({params$bayes$model_sub$mtcResults})
+```
+
+UME inconsistency model (all studies)
+```{r}
+scat_plot(params$bayes$model)$y
+```
+
+UME inconsistency model (sensitivity)
+
+```{r}
+scat_plot(params$bayes$model_sub)$y
+```
 
 
 

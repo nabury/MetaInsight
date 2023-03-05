@@ -72,6 +72,8 @@ shinyServer(function(input, output, session) {
                      freq_sub = freq_sub(),
                      label = treatment_list(),
                      metaoutcome = input$metaoutcome,
+                     model_nodesplit = model_nodesplit(),
+                     model_nodesplit_sub = model_nodesplit_sub(),
                      modelranfix = input$modelranfix,
                      netgraph_label = list(label_all = input$label_all, label_excluded = input$label_excluded),
                      outcome_measure = outcome_measure(),
