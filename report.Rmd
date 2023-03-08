@@ -62,7 +62,7 @@ For treatment rankings, smaller outcome values (e.g. smaller mean values for con
 
 **Model:** `r modelranfix_txt`
 
-**Excluded studies: ** `r paste(params$excluded, collapse = (", "))`
+**Studies excluded from sensitivity analysis: ** `r paste(params$excluded, collapse = (", "))`
 
 #### Study data 
 
@@ -349,9 +349,12 @@ RadialSUCRA(SUCRAData=params$RankingData_sub$SUCRA, ColourData=params$RankingDat
 **Inconsistency test with notesplitting model for all studies**
 
 ```{r echo = FALSE}
-kableExtra::kable(params$model_nodesplit)
+if (is.na(params$model_nodesplit)) {node_text <- "The nodesplit model was not run in the MetaInsight app"
+  } else {kableExtra::kable(params$model_nodesplit)
+}
 ```
 
+`r node_text`
 :::
 
 ::: {}
@@ -359,9 +362,12 @@ kableExtra::kable(params$model_nodesplit)
 **Inconsistency test with notesplitting model with studies excluded**
 
 ```{r echo = FALSE}
-kableExtra::kable(params$model_nodesplit_sub)
+if (is.na(params$model_nodesplit_sub)) {node_sub_text <- "The nodesplit model was not run in the MetaInsight app"
+  } else {kableExtra::kable(params$model_nodesplit_sub)
+}
 ```
 
+`r node_sub_text`
 :::
 
 ::::
