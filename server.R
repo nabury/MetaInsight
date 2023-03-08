@@ -72,8 +72,8 @@ shinyServer(function(input, output, session) {
                      freq_sub = freq_sub(),
                      label = treatment_list(),
                      metaoutcome = input$metaoutcome,
-                     model_nodesplit = model_nodesplit(),
-                     model_nodesplit_sub = model_nodesplit_sub(),
+                     model_nodesplit = nodesplit_report(),
+                     model_nodesplit_sub = nodesplit_sub_report(),
                      modelranfix = input$modelranfix,
                      netgraph_label = list(label_all = input$label_all, label_excluded = input$label_excluded),
                      outcome_measure = outcome_measure(),
@@ -611,10 +611,22 @@ shinyServer(function(input, output, session) {
                    outcome_measure(), input$modelranfix, reference_alter())
   })
   
+  # # Create variable for report (so report works if button is clicked, or not)
+  # model_report <- reactive({
+  #   if (input$baye_do == TRUE) {return(bayesian_model())}
+  #   else {return(NA)}
+  # })
+  
   model_sub <- eventReactive(input$sub_do, {
     bayesian_model(sub = TRUE, data(), treatment_list(), input$metaoutcome, input$exclusionbox, 
                    outcome_measure(), input$modelranfix, reference_alter())
   })
+  
+  # # Create variable for report (so report works if button is clicked, or not)
+  # model_sub_report <- reactive({
+  #   if (input$sub_do == TRUE) {return(model_sub())}
+  #   else {return(NA)}
+  # })
 
   # 3a. Forest plot
 
@@ -813,6 +825,12 @@ shinyServer(function(input, output, session) {
     nodesplit(sub = FALSE, data(), treatment_list(), input$metaoutcome, outcome_measure(),
                     input$modelranfix, input$exclusionbox)
   })
+  
+  # Create variable for report
+  nodesplit_report <- reactive({
+    if (input$node == TRUE) {return(model_nodesplit())}
+    else {return(NA)}
+  })
 
   output$node_table<- renderTable(colnames=TRUE, {
     model_nodesplit()
@@ -823,7 +841,13 @@ shinyServer(function(input, output, session) {
     nodesplit(sub = TRUE, data(), treatment_list(), input$metaoutcome, outcome_measure(),
                     input$modelranfix, input$exclusionbox)
   })
-
+  
+  # Create variable for report
+  nodesplit_sub_report <- reactive({
+    if (input$node_sub == TRUE) {return(model_nodesplit_sub())}
+    else {return(NA)}
+  })
+    
   output$node_table_sub<- renderTable(colnames=TRUE, {
     model_nodesplit_sub()
   })
