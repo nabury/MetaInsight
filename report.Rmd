@@ -318,25 +318,25 @@ kableExtra::kable(baye_comp(params$bayes$model_sub, params$metaoutcome, params$o
 **Litmus Rank-O-Gram for all studies**
 
 ```{r echo = FALSE}
-LitmusRankOGram(CumData=params$RankingData$Cumulative, SUCRAData=params$RankingData$SUCRA, ColourData=params$RankingData$Colour, colourblind=FALSE)
+# LitmusRankOGram(CumData=params$RankingData$Cumulative, SUCRAData=params$RankingData$SUCRA, ColourData=params$RankingData$Colour, colourblind=FALSE)
 ```
 
 **Radial SUCRA for all studies**
 
 ```{r echo = FALSE, warning = FALSE}
-RadialSUCRA(SUCRAData=params$RankingData$SUCRA, ColourData=params$RankingData$Colour, BUGSnetData=params$RankingData$BUGSnetData, colourblind=FALSE)
+# RadialSUCRA(SUCRAData=params$RankingData$SUCRA, ColourData=params$RankingData$Colour, BUGSnetData=params$RankingData$BUGSnetData, colourblind=FALSE)
 ```
 
 **Litmus Rank-O-Gram with studies excluded**
 
 ```{r echo = FALSE}
-LitmusRankOGram(CumData=params$RankingData_sub$Cumulative, SUCRAData=params$RankingData_sub$SUCRA, ColourData=params$RankingData_su$Colour, colourblind=FALSE)
+# LitmusRankOGram(CumData=params$RankingData_sub$Cumulative, SUCRAData=params$RankingData_sub$SUCRA, ColourData=params$RankingData_su$Colour, colourblind=FALSE)
 ```
 
 **Radial SUCRA with studies excluded**
 
 ```{r echo = FALSE, warning = FALSE}
-RadialSUCRA(SUCRAData=params$RankingData_sub$SUCRA, ColourData=params$RankingData_sub$Colour, BUGSnetData=params$RankingData_sub$BUGSnetData, colourblind=FALSE)
+# RadialSUCRA(SUCRAData=params$RankingData_sub$SUCRA, ColourData=params$RankingData_sub$Colour, BUGSnetData=params$RankingData_sub$BUGSnetData, colourblind=FALSE)
 ```
 
 

@@ -60,7 +60,7 @@ shinyServer(function(input, output, session) {
       # Set up parameters to pass to Rmd document
       params <- list(axis = list(freqmin = input$freqmin, freqmax = input$freqmax, 
                                  freqmin_sub = input$freqmin_sub, freqmax_sub = input$freqmax_sub),
-                     bayes = list(model = model(), model_sub = model_sub(),
+                     bayes = list(model = model_report(), model_sub = model_sub_report(),
                                   bayesmax = input$bayesmax, bayesmin = input$bayesmin,
                                   bayesmax_sub = input$bayesmax_sub, bayesmin_sub = input$bayesmin_sub),
                      bugsnetdt = bugsnetdt(),
@@ -611,22 +611,22 @@ shinyServer(function(input, output, session) {
                    outcome_measure(), input$modelranfix, reference_alter())
   })
   
-  # # Create variable for report (so report works if button is clicked, or not)
-  # model_report <- reactive({
-  #   if (input$baye_do == TRUE) {return(bayesian_model())}
-  #   else {return(NA)}
-  # })
+  # Create variable for report (so report works if button is clicked, or not)
+  model_report <- reactive({
+    if (input$baye_do == TRUE) {return(model())}
+    else {return(NA)}
+  })
   
   model_sub <- eventReactive(input$sub_do, {
     bayesian_model(sub = TRUE, data(), treatment_list(), input$metaoutcome, input$exclusionbox, 
                    outcome_measure(), input$modelranfix, reference_alter())
   })
   
-  # # Create variable for report (so report works if button is clicked, or not)
-  # model_sub_report <- reactive({
-  #   if (input$sub_do == TRUE) {return(model_sub())}
-  #   else {return(NA)}
-  # })
+  # Create variable for report (so report works if button is clicked, or not)
+  model_sub_report <- reactive({
+    if (input$sub_do == TRUE) {return(model_sub())}
+    else {return(NA)}
+  })
 
   # 3a. Forest plot
 
