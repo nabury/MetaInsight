@@ -20,8 +20,8 @@ params:
   netgraph_label: NA
   outcome_measure: NA
   ranking: NA
-  RankingData: NA
-  RankingData_sub: NA
+  # RankingData: NA
+  # RankingData_sub: NA
   reference_alter: NA
 ---
 
@@ -258,17 +258,26 @@ Heterogeneity prior: standard deviation ~ U(0,X), where X represents a very larg
 **Forest plot for all studies**
 
 ```{r echo = FALSE}
-make_Forest(params$bayes$model, params$metaoutcome, params$bayes$bayesmin, params$bayes$bayesmax)
+
+if (is.na(params$bayes$model[1])) {bayes_text <- "Bayesian analysis was not conducted in the MetaInsight app"
+  } else {
+    bayes_text <- ""
+    make_Forest(params$bayes$model, params$metaoutcome, params$bayes$bayesmin, params$bayes$bayesmax)
+}
 ```
+
+`r bayes_text`
 
 Model fit:
 
 ```{r echo = FALSE}
-kableExtra::kable(params$bayes$model$dic, digits=3)
 
-model_fit_text <- gemtctau(params$bayes$model, params$outcome_measure)
+if (is.na(params$bayes$model[1])) {model_fit_text <- bayes_text
+  } else {
+    model_fit_text <- gemtctau(params$bayes$model, params$outcome_measure)
+    kableExtra::kable(params$bayes$model$dic, digits=3)
+}
 ```
-
 
 `r model_fit_text`
 
@@ -279,15 +288,26 @@ model_fit_text <- gemtctau(params$bayes$model, params$outcome_measure)
 **Forest plot with studies excluded**
 
 ```{r echo = FALSE}
-make_Forest(params$bayes$model_sub, params$metaoutcome, params$bayes$bayesmin_sub, params$bayes$bayesmax_sub)
+
+if (is.na(params$bayes$model_sub[1])) {bayes_text_sub <- "Bayesian subgroup analysis was not conducted in the MetaInsight app"
+  } else {
+    bayes_text_sub <- ""
+    make_Forest(params$bayes$model_sub, params$metaoutcome, params$bayes$bayesmin_sub, params$bayes$bayesmax_sub)
+  }
+
 ```
+
+`r bayes_text_sub`
 
 Model fit:
 
 ```{r echo = FALSE}
-kableExtra::kable(params$bayes$model_sub$dic, digits=3)
 
-model_sub_text <- gemtctau(params$bayes$model_sub, params$outcome_measure)
+if (is.na(params$bayes$model_sub[1])) {model_sub_text <- bayes_text_sub
+  } else {
+    model_sub_text <- gemtctau(params$bayes$model_sub, params$outcome_measure)
+    kableExtra::kable(params$bayes$model_sub$dic, digits=3)
+  }
 ```
 
 
@@ -303,14 +323,14 @@ In contrast to the 'comparison of all treatment pairs' tab in the frequentist NM
 **Treatment effects for all studies: comparison of all treatment pairs**
 
 ```{r echo = FALSE}
-kableExtra::kable(baye_comp(params$bayes$model, params$metaoutcome, params$outcome_measure))
+#kableExtra::kable(baye_comp(params$bayes$model, params$metaoutcome, params$outcome_measure))
 ```
 
 
 **Treatment effects with studies excluded: comparison of all treatment pairs**
 
 ```{r echo = FALSE}
-kableExtra::kable(baye_comp(params$bayes$model_sub, params$metaoutcome, params$outcome_measure))
+#kableExtra::kable(baye_comp(params$bayes$model_sub, params$metaoutcome, params$outcome_measure))
 ```
 
 #### 3c. Ranking panel
@@ -381,13 +401,13 @@ if (is.na(params$model_nodesplit_sub)) {node_sub_text <- "The nodesplit model wa
 **Results details for all studies**
 
 ```{r echo = FALSE}
-params$bayes$model$sumresults
+#params$bayes$model$sumresults
 ```
 
 **Gelman convergence assessment plot for all studies**
 
 ```{r echo = FALSE}
-gelman.plot(params$bayes$model$mtcResults)
+#gelman.plot(params$bayes$model$mtcResults)
 ```
 
 :::
@@ -397,13 +417,13 @@ gelman.plot(params$bayes$model$mtcResults)
 **Results details with studies excluded**
 
 ```{r echo = FALSE}
-params$bayes$model_sub$sumresults
+#params$bayes$model_sub$sumresults
 ```
 
 **Gelman convergence assessment plot with studies excluded**
 
 ```{r echo = FALSE}
-gelman.plot(params$bayes$model_sub$mtcResults)
+#gelman.plot(params$bayes$model_sub$mtcResults)
 ```
 
 :::
@@ -421,7 +441,7 @@ gelman.plot(params$bayes$model_sub$mtcResults)
 **Residual deviance from NMA model and UME inconsistency model for all studies**
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
-scat_plot(params$bayes$model)$p
+#scat_plot(params$bayes$model)$p
 ```
 
 :::
@@ -431,7 +451,7 @@ scat_plot(params$bayes$model)$p
 **Residual deviance from NMA model and UME inconsistency model with studies excluded**
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
-scat_plot(params$bayes$model_sub)$p
+#scat_plot(params$bayes$model_sub)$p
 ```
 
 :::
@@ -447,7 +467,7 @@ This plot represents each data points' contribution to the residual deviance for
 **Per-arm residual deviance for all studies**
 
 ```{r echo = FALSE, message = FALSE}
-stemplot(params$bayes$model)
+#stemplot(params$bayes$model)
 ```
 
 :::
@@ -457,7 +477,7 @@ stemplot(params$bayes$model)
 **Per-arm residual deviance for sensitivity analysis**
 
 ```{r echo = FALSE, message = FALSE}
-stemplot(params$bayes$model_sub)
+#stemplot(params$bayes$model_sub)
 ```
 
 :::
@@ -473,7 +493,7 @@ This stem plot represents the posterior residual deviance per study arm. The tot
 **Leverage plot for all studies**
 
 ```{r echo = FALSE, message = FALSE}
-levplot(params$bayes$model)
+#levplot(params$bayes$model)
 ```
 
 :::
@@ -483,7 +503,7 @@ levplot(params$bayes$model)
 **Leverage plot for sensitivity analysis**
 
 ```{r echo = FALSE, message = FALSE}
-levplot(params$bayes$model_sub)
+#levplot(params$bayes$model_sub)
 ```
 
 :::
@@ -499,17 +519,18 @@ This leverage plot shows the average leverage across the arms for each study ({s
 **Model codes for analysis of all studies**
 
 ```{r echo = FALSE}
-code_text <- params$bayesmodel$mtcResults$model$code
+#code_text <- params$bayesmodel$mtcResults$model$code
+
+#`r code_text`
 ```
 
-`r code_text`
 
 ##### 3g-2 Initial values
 
 **Initial values**
 
 ```{r echo = FALSE}
-params$bayes$model$mtcResults$model$inits
+#params$bayes$model$mtcResults$model$inits
 ```
 
 ##### 3g-3 Download simulations
@@ -527,12 +548,12 @@ This tab is deliberately blank as the associated MetaInsight tab contains only d
 NMA (consistency) model
 
 ```{r echo = FALSE}
-mtc.deviance({params$bayes$model$mtcResults})
+#mtc.deviance({params$bayes$model$mtcResults})
 ```
 
 UME (inconsistency) model
 ```{r echo = FALSE, warning = FALSE}
-scat_plot(params$bayes$model)$y
+#scat_plot(params$bayes$model)$y
 ```
 
 :::
@@ -544,13 +565,13 @@ scat_plot(params$bayes$model)$y
 NMA (consistency) model
 
 ```{r echo = FALSE}
-mtc.deviance({params$bayes$model_sub$mtcResults})
+#mtc.deviance({params$bayes$model_sub$mtcResults})
 ```
 
 UME (inconsistency) model
 
 ```{r warning = FALSE}
-scat_plot(params$bayes$model_sub)$y
+#scat_plot(params$bayes$model_sub)$y
 ```
 
 :::
