@@ -272,8 +272,8 @@ Model fit:
 
 ```{r echo = FALSE}
 
-if (is.na(params$bayes$model[1])) {model_fit_text <- bayes_text
-  } else {
+if (is.na(params$bayes$model[1])) {model_fit_text <- ""
+} else {
     model_fit_text <- gemtctau(params$bayes$model, params$outcome_measure)
     kableExtra::kable(params$bayes$model$dic, digits=3)
 }
@@ -290,10 +290,10 @@ if (is.na(params$bayes$model[1])) {model_fit_text <- bayes_text
 ```{r echo = FALSE}
 
 if (is.na(params$bayes$model_sub[1])) {bayes_text_sub <- "Bayesian subgroup analysis was not conducted in the MetaInsight app"
-  } else {
+} else {
     bayes_text_sub <- ""
     make_Forest(params$bayes$model_sub, params$metaoutcome, params$bayes$bayesmin_sub, params$bayes$bayesmax_sub)
-  }
+}
 
 ```
 
@@ -303,13 +303,12 @@ Model fit:
 
 ```{r echo = FALSE}
 
-if (is.na(params$bayes$model_sub[1])) {model_sub_text <- bayes_text_sub
-  } else {
+if (is.na(params$bayes$model_sub[1])) {model_sub_text <- ""
+} else {
     model_sub_text <- gemtctau(params$bayes$model_sub, params$outcome_measure)
     kableExtra::kable(params$bayes$model_sub$dic, digits=3)
-  }
+}
 ```
-
 
 `r model_sub_text`
 :::
@@ -323,15 +322,19 @@ In contrast to the 'comparison of all treatment pairs' tab in the frequentist NM
 **Treatment effects for all studies: comparison of all treatment pairs**
 
 ```{r echo = FALSE}
-#kableExtra::kable(baye_comp(params$bayes$model, params$metaoutcome, params$outcome_measure))
+if (!is.na(params$bayes$model[1])) {kableExtra::kable(baye_comp(params$bayes$model, params$metaoutcome, params$outcome_measure))}
 ```
 
+`r bayes_text`
 
 **Treatment effects with studies excluded: comparison of all treatment pairs**
 
 ```{r echo = FALSE}
-#kableExtra::kable(baye_comp(params$bayes$model_sub, params$metaoutcome, params$outcome_measure))
+
+if (!is.na(params$bayes$model_sub[1])) {kableExtra::kable(baye_comp(params$bayes$model_sub, params$metaoutcome, params$outcome_measure))}
 ```
+
+`r bayes_text_sub`
 
 #### 3c. Ranking panel
 
@@ -403,6 +406,7 @@ if (is.na(params$model_nodesplit_sub)) {node_sub_text <- "The nodesplit model wa
 ```{r echo = FALSE}
 #params$bayes$model$sumresults
 ```
+
 
 **Gelman convergence assessment plot for all studies**
 
