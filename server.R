@@ -78,8 +78,8 @@ shinyServer(function(input, output, session) {
                      netgraph_label = list(label_all = input$label_all, label_excluded = input$label_excluded),
                      outcome_measure = outcome_measure(),
                      ranking = input$rankopts,
-                     RankingData = RankingData(),
-                     RankingData_sub = RankingData_sub(),
+                     # RankingData = RankingData(),
+                     # RankingData_sub = RankingData_sub(),
                      reference_alter = reference_alter())
       
       # Knit the document, passing in the `params` list, and eval it in a child of the global environment 
