@@ -519,6 +519,7 @@ if (!is.na(params$bayes$model_sub[1])) {levplot(params$bayes$model_sub)}
 ```
 
 `r bayes_text_sub`
+
 :::
 
 ::::
@@ -532,23 +533,25 @@ This leverage plot shows the average leverage across the arms for each study ({s
 **Model codes for analysis of all studies**
 
 ```{r echo = FALSE}
-#code_text <- params$bayesmodel$mtcResults$model$code
-
-#`r code_text`
+if (is.na(params$bayes$model[1])) {code_text <- bayes_text
+} else {code_text <- params$bayes$model$mtcResults$model$code}
 ```
 
+`r code_text`
 
 ##### 3g-2 Initial values
 
 **Initial values**
 
 ```{r echo = FALSE}
-#params$bayes$model$mtcResults$model$inits
+if (!is.na(params$bayes$model[1])) {params$bayes$model$mtcResults$model$inits}
 ```
+
+`r bayes_text`
 
 ##### 3g-3 Download simulations
 
-This tab is deliberately blank as the associated MetaInsight tab contains only download buttons
+This tab has been deliberately left empty as the associated MetaInsight tab contains only download buttons
 
 ##### 3g-4 Deviance details
 
@@ -561,12 +564,15 @@ This tab is deliberately blank as the associated MetaInsight tab contains only d
 NMA (consistency) model
 
 ```{r echo = FALSE}
-#mtc.deviance({params$bayes$model$mtcResults})
+if (!is.na(params$bayes$model[1])) {mtc.deviance({params$bayes$model$mtcResults})}
 ```
 
+`r bayes_text`
+
 UME (inconsistency) model
+
 ```{r echo = FALSE, warning = FALSE}
-#scat_plot(params$bayes$model)$y
+if (!is.na(params$bayes$model[1])) {scat_plot(params$bayes$model)$y}
 ```
 
 :::
@@ -578,13 +584,15 @@ UME (inconsistency) model
 NMA (consistency) model
 
 ```{r echo = FALSE}
-#mtc.deviance({params$bayes$model_sub$mtcResults})
+if (!is.na(params$bayes$model_sub[1])) {mtc.deviance({params$bayes$model_sub$mtcResults})}
 ```
+
+`r bayes_text_sub`
 
 UME (inconsistency) model
 
-```{r warning = FALSE}
-#scat_plot(params$bayes$model_sub)$y
+```{r echo = FALSE, warning = FALSE}
+if (!is.na(params$bayes$model_sub[1])) {scat_plot(params$bayes$model_sub)$y}
 ```
 
 :::
