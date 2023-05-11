@@ -741,6 +741,7 @@ tabPanel("Load Data",
 ###################################
 
 tabPanel("Report",
+         p("Wait until MetaInsight has completed any analysis before clicking the generate report button"),
          downloadButton("report", "Generate report")
 ),
 

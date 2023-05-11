@@ -385,7 +385,7 @@ if (is.na(params$model_nodesplit)) {node_text <- "The nodesplit model was not ru
 **Inconsistency test with notesplitting model with studies excluded**
 
 ```{r echo = FALSE}
-if (is.na(params$model_nodesplit_sub)) {node_sub_text <- "The nodesplit model was not run in the MetaInsight app"
+if (is.na(params$model_nodesplit_sub)) {node_sub_text <- "The nodesplit subgroup model was not run in the MetaInsight app"
   } else {kableExtra::kable(params$model_nodesplit_sub)
 }
 ```
@@ -404,14 +404,15 @@ if (is.na(params$model_nodesplit_sub)) {node_sub_text <- "The nodesplit model wa
 **Results details for all studies**
 
 ```{r echo = FALSE}
-#params$bayes$model$sumresults
+if (!is.na(params$bayes$model[1])) {params$bayes$model$sumresults}
 ```
 
+`r bayes_text`
 
 **Gelman convergence assessment plot for all studies**
 
 ```{r echo = FALSE}
-#gelman.plot(params$bayes$model$mtcResults)
+if (!is.na(params$bayes$model[1])) {gelman.plot(params$bayes$model$mtcResults)}
 ```
 
 :::
@@ -421,13 +422,15 @@ if (is.na(params$model_nodesplit_sub)) {node_sub_text <- "The nodesplit model wa
 **Results details with studies excluded**
 
 ```{r echo = FALSE}
-#params$bayes$model_sub$sumresults
+if (!is.na(params$bayes$model_sub[1])) {params$bayes$model_sub$sumresults}
 ```
+
+`r bayes_text_sub`
 
 **Gelman convergence assessment plot with studies excluded**
 
 ```{r echo = FALSE}
-#gelman.plot(params$bayes$model_sub$mtcResults)
+if (!is.na(params$bayes$model_sub[1])) {gelman.plot(params$bayes$model_sub$mtcResults)}
 ```
 
 :::
@@ -445,9 +448,10 @@ if (is.na(params$model_nodesplit_sub)) {node_sub_text <- "The nodesplit model wa
 **Residual deviance from NMA model and UME inconsistency model for all studies**
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
-#scat_plot(params$bayes$model)$p
+if (!is.na(params$bayes$model[1])) {scat_plot(params$bayes$model)$p}
 ```
 
+`r bayes_text`
 :::
 
 ::: {}
@@ -455,9 +459,10 @@ if (is.na(params$model_nodesplit_sub)) {node_sub_text <- "The nodesplit model wa
 **Residual deviance from NMA model and UME inconsistency model with studies excluded**
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
-#scat_plot(params$bayes$model_sub)$p
+if (!is.na(params$bayes$model_sub[1])) {scat_plot(params$bayes$model_sub)$p}
 ```
 
+`r bayes_text_sub`
 :::
 
 ::::
@@ -471,9 +476,10 @@ This plot represents each data points' contribution to the residual deviance for
 **Per-arm residual deviance for all studies**
 
 ```{r echo = FALSE, message = FALSE}
-#stemplot(params$bayes$model)
+if (!is.na(params$bayes$model[1])) {stemplot(params$bayes$model)}
 ```
 
+`r bayes_text`
 :::
 
 ::: {}
@@ -481,9 +487,10 @@ This plot represents each data points' contribution to the residual deviance for
 **Per-arm residual deviance for sensitivity analysis**
 
 ```{r echo = FALSE, message = FALSE}
-#stemplot(params$bayes$model_sub)
+if (!is.na(params$bayes$model_sub[1])) {stemplot(params$bayes$model_sub)}
 ```
 
+`r bayes_text_sub`
 :::
 
 ::::
@@ -497,9 +504,10 @@ This stem plot represents the posterior residual deviance per study arm. The tot
 **Leverage plot for all studies**
 
 ```{r echo = FALSE, message = FALSE}
-#levplot(params$bayes$model)
+if (!is.na(params$bayes$model[1])) {levplot(params$bayes$model)}
 ```
 
+`r bayes_text`
 :::
 
 ::: {}
@@ -507,9 +515,10 @@ This stem plot represents the posterior residual deviance per study arm. The tot
 **Leverage plot for sensitivity analysis**
 
 ```{r echo = FALSE, message = FALSE}
-#levplot(params$bayes$model_sub)
+if (!is.na(params$bayes$model_sub[1])) {levplot(params$bayes$model_sub)}
 ```
 
+`r bayes_text_sub`
 :::
 
 ::::
