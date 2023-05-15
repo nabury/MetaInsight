@@ -298,6 +298,7 @@ tabPanel("Load Data",
                    
                    tabPanel("Data analysis", id="dtanalysis",
                             htmlOutput("CONBI2"),
+                            useShinyjs(), # Required to hide sidebar panel for Bayesian analysis
                             tags$head(tags$style("#CONBI2{color: white;
                font-size: 20px;
                font-style: bold;
@@ -307,12 +308,13 @@ tabPanel("Load Data",
                             br(),
                             sidebarLayout(
                               sidebarPanel(
+                                id="sidebar",
                                 conditionalPanel(condition= "input.metaoutcome=='Continuous'",
                                                  radioButtons("outcomeCont", "Outcome for continuous data:", c("Mean Difference (MD)" = "MD","Standardised Mean Difference (SMD)" = "SMD"))
                                 ),
                                 conditionalPanel(condition = "input.metaoutcome=='Binary'",
                                                  radioButtons("outcomebina", "Outcome for binary data:", c("Odds Ratio (OR)" = "OR","Risk Ratio (RR)" = "RR", "Risk Difference (RD)" = "RD"))
-                                ),               
+                                ),
                                 uiOutput("RankingPref"), 
                                 radioButtons("modelranfix", "Model:", c("Random effect (RE)" = "random", "Fixed effect (FE)" = "fixed")),
                                 h3("Select studies to exclude:"),
@@ -323,7 +325,7 @@ tabPanel("Load Data",
                                 uiOutput("Choicesexcl"), 
                                 h5("NB: If a whole treatment is removed from the analysis the NMA will return an error message. To overcome this, please remove the treatment from the data."), width = 3
                               ),
-                              mainPanel(
+                              mainPanel(id = "data_analysis_main",
                                 bsCollapse(id = "collapse",
                                            bsCollapsePanel("Data table (Click to open / hide this panel)",
                                                            "Users can use the filter box under each column of heading to select studies to exclude in the sensitivity analysis.",
@@ -341,7 +343,7 @@ tabPanel("Load Data",
             .tabbable > .nav > li > a[data-value='3. Bayesian network meta-analysis'] {background-color: #2196c4;   color:white; font-size: 18px}
             .tabbable > .nav > li[class=active]    > a {font-weight:900;font-style: italic;text-decoration: underline }
             ")),
-       tabsetPanel(
+       tabsetPanel(id = "data_analysis_tabset",
          tabPanel("1. Data summary", tabsetPanel(
            tabPanel("1a. Data Characteristics", 
                     p("This tab shows a summary of study characteristics."),

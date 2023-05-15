@@ -600,11 +600,22 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  # Hides sidebar when Bayesian analysis tab is viewed
+  observeEvent(input[["data_analysis_tabset"]], {
+    if(input[["data_analysis_tabset"]] == "3. Bayesian network meta-analysis"){
+      hideElement(selector = "#sidebar")
+      removeCssClass("data_analysis_main", "col-sm-9") 
+      addCssClass("data_analysis_main", "col-sm-12") # Fills sidebar space
+    }else{
+      showElement(selector = "#sidebar")
+      removeCssClass("data_analysis_main", "col-sm-12")
+      addCssClass("data_analysis_main", "col-sm-9")
+    }
+  })
+  
   
   
   # Bayesian analysis
-  
-  # model <- NA
   
   model <- eventReactive(input$baye_do, {
     bayesian_model(sub = FALSE, data(), treatment_list(), input$metaoutcome, input$exclusionbox,
