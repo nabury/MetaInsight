@@ -330,6 +330,7 @@ tabPanel("Load Data",
             .tabbable > .nav > li > a[data-value='2b. Comparison of all treatment pairs'] {background-color: white;}
             .tabbable > .nav > li > a[data-value='2c. Inconsistency'] {background-color: white;}
             .tabbable > .nav > li > a[data-value='3. Bayesian network meta-analysis'] {background-color: #2196c4;   color:white; font-size: 18px}
+            .tabbable > .nav > li > a[data-value='4. Downloadable report'] {background-color: #2196c4;   color:white; font-size: 18px}
             .tabbable > .nav > li[class=active]    > a {font-weight:900;font-style: italic;text-decoration: underline }
             ")),
        tabsetPanel(id = "data_analysis_tabset",
@@ -725,7 +726,12 @@ tabPanel("Load Data",
                column(6, p("UME (inconsistency) model"), verbatimTextOutput("dev_ume")),
                column(6, p("UME (inconsistency) model"), verbatimTextOutput("dev_ume_sub")
                ))   
-)))))), width=9))),
+))))),
+tabPanel("4. Downloadable report",
+         p("Wait until MetaInsight has completed any analysis before clicking the generate report button"),
+         downloadButton("report", "Generate report")
+),
+), width=9))),
 
 # Add tab panel for report
 # tabPanel("Report",
