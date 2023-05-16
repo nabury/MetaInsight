@@ -1,0 +1,601 @@
+---
+title: ""
+output: html_document
+
+params:
+  axis: NA
+  bayes: NA
+  bugsnetdt: NA
+  data: NA
+  excluded: NA
+  exclusionbox: NA
+  forest: NA
+  freq_all: NA
+  freq_sub: NA
+  label: NA
+  metaoutcome: NA
+  model_nodesplit: NA
+  model_nodesplit_sub: NA
+  modelranfix: NA
+  netgraph_label: NA
+  outcome_measure: NA
+  ranking: NA
+  # RankingData: NA
+  # RankingData_sub: NA
+  reference_alter: NA
+---
+
+```{r include = FALSE}
+library(kableExtra)
+library(knitr)
+```
+## MetaInsight Report {.tabset}
+
+### User inputs and selections {.tabset}
+
+#### User selections
+
+```{r echo = FALSE}
+if (params$metaoutcome == "Continuous") {outcome_type_txt <- "Continuous (mean difference)"
+} else {outcome_type_txt <- "Binary (odds ratio)"}
+
+if (params$outcome_measure == "MD") {outcome_measure_txt <- "Mean difference"
+} else if (params$outcome_measure == "SMD") {outcome_measure_txt <- "Standardised mean difference"
+} else if (params$outcome_measure == "OR") {outcome_measure_txt <- "Odds ratio"
+} else if (params$outcome_measure == "RR") {outcome_measure_txt <- "Risk ratio"
+} else if (params$outcome_measure == "RD") {outcome_measure_txt <- "Risk difference"
+}
+
+if (params$ranking == "good") {ranking_txt <- "desirable"
+} else {ranking_txt <- "undesirable"}
+
+if (params$modelranfix == "random") {modelranfix_txt <- "Random effect"
+} else {modelranfix_txt <- "Fixed effect"}
+
+```
+
+**Outcome type:** `r outcome_type_txt`
+
+**Outcome measure:** `r outcome_measure_txt`
+
+For treatment rankings, smaller outcome values (e.g. smaller mean values for continuous data, or ORs less than 1 for binary data) are: **`r ranking_txt`**
+
+**Model:** `r modelranfix_txt`
+
+**Studies excluded from sensitivity analysis: ** `r paste(params$excluded, collapse = (", "))`
+
+#### Study data 
+
+```{r echo = FALSE}
+knitr::kable(params$data)
+```
+
+#### Treatment labels
+
+```{r echo = FALSE}
+kableExtra::kable(treatment_label(params$label))
+```
+
+
+### 1. Data summary {.tabset}
+
+#### 1a. Data characteristics
+
+This tab shows a summary of study characteristics
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
+
+::: {}
+
+**Characteristics table of all studies**
+
+```{r echo = FALSE}
+kableExtra::kable(summary_table_plot(params$bugsnetdt, params$metaoutcome))
+```
+
+:::
+
+::: {}
+
+**Characteristics table with studies excluded**
+
+```{r echo = FALSE}
+kableExtra::kable(summary_table_plot(filter(params$bugsnetdt, !Study %in% params$exclusionbox), params$metaoutcome))
+```
+
+:::
+
+::::
+
+#### 1b. Study results  
+
+```{r echo = FALSE}
+make_netStudy(params$freq_sub, params$outcome_measure, params$forest$ForestHeader, params$forest$ForestTitle)
+```
+
+
+#### 1c. Network plot  
+
+:::: {style="display: flex;"}
+
+::: {}
+
+**Network plot of all studies**
+
+Number of trials shown on the line:
+
+```{r echo = FALSE}
+make_netgraph(params$freq_all, params$netgraph_label$label_all)
+```
+
+Number of trials indicated by node size and line thickness:
+
+```{r echo = FALSE}
+make_netplot(params$bugsnetdt, params$netgraph_label$label_all)
+```
+
+Network connectivity
+
+```{r echo = FALSE}
+make_netconnect(params$freq_all)
+```
+
+:::
+
+::: {}
+
+**Network plot with studies excluded**   
+
+Number of trials shown on the line:
+
+```{r echo = FALSE}
+make_netgraph(params$freq_sub, params$netgraph_label$label_excluded)
+```
+
+Number of trials indicated by node size and line thickness:
+
+```{r echo = FALSE}
+make_netplot(filter(params$bugsnetdt, !Study %in% params$exclusionbox), params$netgraph_label$label_all)
+```
+
+Network connectivity
+
+```{r echo = FALSE}
+make_netconnect(params$freq_sub)
+```
+
+:::
+
+::::
+
+### 2. Frequentist network meta-analysis {.tabset}
+
+
+#### 2a. Forest plot 
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
+
+::: {}
+
+**Results for all studies**
+
+```{r echo = FALSE}
+make_netComp(params$freq_all, params$modelranfix, params$reference_alter$ref_all, params$axis$freqmin, params$axis$freqmax)
+
+text <- texttau(params$freq_all, params$outcome_measure, params$modelranfix)
+
+ref_text <- make_refText(params$reference_alter$ref_all)
+```
+
+`r text`
+
+`r ref_text`
+
+:::
+
+::: {}
+
+**Results with studies excluded**
+
+```{r echo = FALSE}
+make_netComp(params$freq_sub, params$modelranfix, params$reference_alter$ref_sub, params$axis$freqmin_sub, params$axis$freqmax_sub)
+
+text <- texttau(params$freq_sub, params$outcome_measure, params$modelranfix)
+
+ref_text <- make_refText(params$reference_alter$ref_sub)
+```
+
+`r text`
+
+`r ref_text`
+
+:::
+
+::::
+
+#### 2b. Comparison of all treatment pairs
+
+Treatments are ranked from best to worst along the leading diagonal. Above the leading diagonal are estimates from pairwise meta-analyses, below the leading diagonal are estimates from network meta-analyses.
+
+**Relative treatment effects in ranked order for all studies**
+
+```{r echo = FALSE}
+make_netrank(params$freq_all, params$modelranfix, params$ranking)
+```
+
+**Relative treatment effects in ranked order with studies excluded**
+
+```{r echo = FALSE}
+make_netrank(params$freq_sub, params$modelranfix, params$ranking)
+```
+
+
+#### 2c. Inconsistency
+
+**Assessment of inconsistency for all studies**
+
+```{r echo = FALSE}
+kableExtra::kable(make_Incon(params$freq_all, params$modelranfix))
+```
+
+**Assessment of inconsistency with studies removed**
+
+```{r echo = FALSE}
+kableExtra::kable(make_Incon(params$freq_sub, params$modelranfix))
+```
+
+### 3. Bayesian Network Meta-analysis {.tabset}
+
+#### 3a. Forest plot 
+
+Bayesian result using the gemtc package. 
+Heterogeneity prior: standard deviation ~ U(0,X), where X represents a very large difference in the analysis' outcome scale and is determined from the data. 
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
+
+::: {}
+
+**Forest plot for all studies**
+
+```{r echo = FALSE}
+
+if (is.na(params$bayes$model[1])) {bayes_text <- "Bayesian analysis was not conducted in the MetaInsight app"
+  } else {
+    bayes_text <- ""
+    make_Forest(params$bayes$model, params$metaoutcome, params$bayes$bayesmin, params$bayes$bayesmax)
+}
+```
+
+`r bayes_text`
+
+Model fit:
+
+```{r echo = FALSE}
+
+if (is.na(params$bayes$model[1])) {model_fit_text <- ""
+} else {
+    model_fit_text <- gemtctau(params$bayes$model, params$outcome_measure)
+    kableExtra::kable(params$bayes$model$dic, digits=3)
+}
+```
+
+`r model_fit_text`
+
+:::
+
+::: {}
+
+**Forest plot with studies excluded**
+
+```{r echo = FALSE}
+
+if (is.na(params$bayes$model_sub[1])) {bayes_text_sub <- "Bayesian subgroup analysis was not conducted in the MetaInsight app"
+} else {
+    bayes_text_sub <- ""
+    make_Forest(params$bayes$model_sub, params$metaoutcome, params$bayes$bayesmin_sub, params$bayes$bayesmax_sub)
+}
+
+```
+
+`r bayes_text_sub`
+
+Model fit:
+
+```{r echo = FALSE}
+
+if (is.na(params$bayes$model_sub[1])) {model_sub_text <- ""
+} else {
+    model_sub_text <- gemtctau(params$bayes$model_sub, params$outcome_measure)
+    kableExtra::kable(params$bayes$model_sub$dic, digits=3)
+}
+```
+
+`r model_sub_text`
+:::
+
+::::
+
+#### 3b. Comparison of all treatment pairs
+
+In contrast to the 'comparison of all treatment pairs' tab in the frequentist NMA results, this table only contains the estimates from the network meta analysis, i.e. does not contain estimates from pairwise meta-analysis which only contains direct evidence.
+
+**Treatment effects for all studies: comparison of all treatment pairs**
+
+```{r echo = FALSE}
+if (!is.na(params$bayes$model[1])) {kableExtra::kable(baye_comp(params$bayes$model, params$metaoutcome, params$outcome_measure))}
+```
+
+`r bayes_text`
+
+**Treatment effects with studies excluded: comparison of all treatment pairs**
+
+```{r echo = FALSE}
+
+if (!is.na(params$bayes$model_sub[1])) {kableExtra::kable(baye_comp(params$bayes$model_sub, params$metaoutcome, params$outcome_measure))}
+```
+
+`r bayes_text_sub`
+
+#### 3c. Ranking panel
+
+**Litmus Rank-O-Gram for all studies**
+
+```{r echo = FALSE}
+# LitmusRankOGram(CumData=params$RankingData$Cumulative, SUCRAData=params$RankingData$SUCRA, ColourData=params$RankingData$Colour, colourblind=FALSE)
+```
+
+**Radial SUCRA for all studies**
+
+```{r echo = FALSE, warning = FALSE}
+# RadialSUCRA(SUCRAData=params$RankingData$SUCRA, ColourData=params$RankingData$Colour, BUGSnetData=params$RankingData$BUGSnetData, colourblind=FALSE)
+```
+
+**Litmus Rank-O-Gram with studies excluded**
+
+```{r echo = FALSE}
+# LitmusRankOGram(CumData=params$RankingData_sub$Cumulative, SUCRAData=params$RankingData_sub$SUCRA, ColourData=params$RankingData_su$Colour, colourblind=FALSE)
+```
+
+**Radial SUCRA with studies excluded**
+
+```{r echo = FALSE, warning = FALSE}
+# RadialSUCRA(SUCRAData=params$RankingData_sub$SUCRA, ColourData=params$RankingData_sub$Colour, BUGSnetData=params$RankingData_sub$BUGSnetData, colourblind=FALSE)
+```
+
+
+#### 3d. Nodesplit model
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
+
+::: {}
+
+**Inconsistency test with notesplitting model for all studies**
+
+```{r echo = FALSE}
+if (is.na(params$model_nodesplit)) {node_text <- "The nodesplit model was not run in the MetaInsight app"
+  } else {kableExtra::kable(params$model_nodesplit)
+}
+```
+
+`r node_text`
+:::
+
+::: {}
+
+**Inconsistency test with notesplitting model with studies excluded**
+
+```{r echo = FALSE}
+if (is.na(params$model_nodesplit_sub)) {node_sub_text <- "The nodesplit subgroup model was not run in the MetaInsight app"
+  } else {kableExtra::kable(params$model_nodesplit_sub)
+}
+```
+
+`r node_sub_text`
+:::
+
+::::
+
+#### 3e. Bayesian result details
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
+
+::: {}
+
+**Results details for all studies**
+
+```{r echo = FALSE}
+if (!is.na(params$bayes$model[1])) {params$bayes$model$sumresults}
+```
+
+`r bayes_text`
+
+**Gelman convergence assessment plot for all studies**
+
+```{r echo = FALSE}
+if (!is.na(params$bayes$model[1])) {gelman.plot(params$bayes$model$mtcResults)}
+```
+
+:::
+
+::: {}
+
+**Results details with studies excluded**
+
+```{r echo = FALSE}
+if (!is.na(params$bayes$model_sub[1])) {params$bayes$model_sub$sumresults}
+```
+
+`r bayes_text_sub`
+
+**Gelman convergence assessment plot with studies excluded**
+
+```{r echo = FALSE}
+if (!is.na(params$bayes$model_sub[1])) {gelman.plot(params$bayes$model_sub$mtcResults)}
+```
+
+:::
+
+::::
+
+#### 3f. Deviance report
+
+**Deviance report for all studies and the sensitivity analysis**
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
+
+::: {}
+
+**Residual deviance from NMA model and UME inconsistency model for all studies**
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+if (!is.na(params$bayes$model[1])) {scat_plot(params$bayes$model)$p}
+```
+
+`r bayes_text`
+:::
+
+::: {}
+
+**Residual deviance from NMA model and UME inconsistency model with studies excluded**
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+if (!is.na(params$bayes$model_sub[1])) {scat_plot(params$bayes$model_sub)$p}
+```
+
+`r bayes_text_sub`
+:::
+
+::::
+
+This plot represents each data points' contribution to the residual deviance for the NMA with consistency (horizontal axis) and the unrelated mean effect (ume) inconsistency models (vertical axis) along with the line of equality. The points on the equality line means there is no improvement in model fit when using the inconsistency model, suggesting that there is no evidence of inconsistency. Points above the equality line means they have a smaller residual deviance for the consistency model indicating a better fit in the NMA consistency model and points below the equality line means they have a better fit in the ume inconsistency model. Please note that the unrelated mean effects model may not handle multi-arm trials correctly. (Further reading: Dias S, Ades AE, Welton NJ, Jansen JP, Sutton AJ. Network meta-anlaysis for decision-making. Chapter 3 Model fit, model comparison and outlier detection. @2018 John Wiley & Sons Ltd.)
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
+
+::: {}
+
+**Per-arm residual deviance for all studies**
+
+```{r echo = FALSE, message = FALSE}
+if (!is.na(params$bayes$model[1])) {stemplot(params$bayes$model)}
+```
+
+`r bayes_text`
+:::
+
+::: {}
+
+**Per-arm residual deviance for sensitivity analysis**
+
+```{r echo = FALSE, message = FALSE}
+if (!is.na(params$bayes$model_sub[1])) {stemplot(params$bayes$model_sub)}
+```
+
+`r bayes_text_sub`
+:::
+
+::::
+
+This stem plot represents the posterior residual deviance per study arm. The total number of stems equals the total number of data points in the network meta analysis. Going from left to right, the alternating symbols on the stems indicate the different studies. Each stem corresponds to the residual deviance ($dev.ab) associated with each arm in each study. The smaller residual deviance (the shorter stem), dev.ab, the better model fit for each data point. You can identify which stem corresponds to which study arm by hovering on the stem symbols. (Further reading: Dias S, Ades AE, Welton NJ, Jansen JP, Sutton AJ. Network meta-anlaysis for decision-making. Chapter 3 Model fit, model comparison and outlier detection. @2018 John Wiley & Sons Ltd.)
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
+
+::: {}
+
+**Leverage plot for all studies**
+
+```{r echo = FALSE, message = FALSE}
+if (!is.na(params$bayes$model[1])) {levplot(params$bayes$model)}
+```
+
+`r bayes_text`
+:::
+
+::: {}
+
+**Leverage plot for sensitivity analysis**
+
+```{r echo = FALSE, message = FALSE}
+if (!is.na(params$bayes$model_sub[1])) {levplot(params$bayes$model_sub)}
+```
+
+`r bayes_text_sub`
+
+:::
+
+::::
+
+This leverage plot shows the average leverage across the arms for each study ({sum(\$lev.ab)}/{number of arms} for each study) versus the square root of the average residual deviance across the arms for each study (sqrt({sum(\$dev.ab)}/{number of arms}) for each study). The leverage for each data point, is calculated as the posterior mean of the residual deviance, minus the deviance at the posterior mean of the fitted values. The leverage plot may be used to identify influential and/or poorly fitting studies and can be used to check how each study is affecting the overall model fit and DIC. Curves of the form x2 + y = c, c = 1, 2, 3, ., where x represents square root of residual deviance, and y represents the leverage, are marked on the plot. Points lying on such parabolas each contribute an amount c to the DIC (Spiegelhalter et al., 2002). Points that lie outside the line with c = 3 can generally be identified as contributing to the model's poor fit. Points with a high leverage are influential, which means that they have a strong influence on the model parameters that generate their fitted values. (Further reading: Dias S, Ades AE, Welton NJ, Jansen JP, Sutton AJ. Network meta-anlaysis for decision-making. Chapter 3 Model fit, model comparison and outlier detection. @2018 John Wiley & Sons Ltd. Spiegelhalter et al. (2002) Bayesian measures of model complexity and fit. J. R. Statist. Soc.B 64, Part4, pp.583-639)
+
+#### 3g. Model details {.tabset}
+
+##### 3g-1 Model codes 
+
+**Model codes for analysis of all studies**
+
+```{r echo = FALSE}
+if (is.na(params$bayes$model[1])) {code_text <- bayes_text
+} else {code_text <- params$bayes$model$mtcResults$model$code}
+```
+
+`r code_text`
+
+##### 3g-2 Initial values
+
+**Initial values**
+
+```{r echo = FALSE}
+if (!is.na(params$bayes$model[1])) {params$bayes$model$mtcResults$model$inits}
+```
+
+`r bayes_text`
+
+##### 3g-3 Download simulations
+
+This tab has been deliberately left empty as the associated MetaInsight tab contains only download buttons
+
+##### 3g-4 Deviance details
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 30px;"}
+
+::: {}
+
+**Deviance data for all studies** 
+
+NMA (consistency) model
+
+```{r echo = FALSE}
+if (!is.na(params$bayes$model[1])) {mtc.deviance({params$bayes$model$mtcResults})}
+```
+
+`r bayes_text`
+
+UME (inconsistency) model
+
+```{r echo = FALSE, warning = FALSE}
+if (!is.na(params$bayes$model[1])) {scat_plot(params$bayes$model)$y}
+```
+
+:::
+
+::: {}
+
+**Deviance data for sensitivity analysis**
+
+NMA (consistency) model
+
+```{r echo = FALSE}
+if (!is.na(params$bayes$model_sub[1])) {mtc.deviance({params$bayes$model_sub$mtcResults})}
+```
+
+`r bayes_text_sub`
+
+UME (inconsistency) model
+
+```{r echo = FALSE, warning = FALSE}
+if (!is.na(params$bayes$model_sub[1])) {scat_plot(params$bayes$model_sub)$y}
+```
+
+:::
+
+::::
+

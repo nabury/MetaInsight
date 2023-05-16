@@ -42,6 +42,7 @@ source("fn_analysis.R",local = TRUE)              # functions for NMA
 shinyServer(function(input, output, session) {
   source("downloadbuttons.R", local = TRUE)   #codes for download buttons for conciseness. This line must be put within the shinyserver as this is purely a code file not functions.
   
+
   # Create a definable reactive value to allow reloading of data
   reload <- reactiveVal(F)
   
@@ -109,6 +110,54 @@ shinyServer(function(input, output, session) {
   output$file_input = default_file_input
   
   #####
+  # Report
+  # NVB
+  #####
+  
+  # Create Rmd report
+  output$report <- downloadHandler(
+    
+    filename = "MetaInsightReport.html",
+    content = function(file) {
+      
+      # Copy the report file to a temporary directory before processing it
+      tempReport <- file.path(tempdir(), "report.Rmd")
+      file.copy("report.Rmd", tempReport, overwrite = TRUE)
+      
+      # Set up parameters to pass to Rmd document
+      params <- list(axis = list(freqmin = input$freqmin, freqmax = input$freqmax, 
+                                 freqmin_sub = input$freqmin_sub, freqmax_sub = input$freqmax_sub),
+                     bayes = list(model = model_report(), model_sub = model_sub_report(),
+                                  bayesmax = input$bayesmax, bayesmin = input$bayesmin,
+                                  bayesmax_sub = input$bayesmax_sub, bayesmin_sub = input$bayesmin_sub),
+                     bugsnetdt = bugsnetdt(),
+                     data = data(),
+                     excluded = paste(input$exclusionbox, collapse = ", "),
+                     exclusionbox = input$exclusionbox,
+                     forest = list(ForestHeader = input$ForestHeader, ForestTitle = input$ForestTitle),
+                     freq_all = freq_all(),
+                     freq_sub = freq_sub(),
+                     label = treatment_list(),
+                     metaoutcome = input$metaoutcome,
+                     model_nodesplit = nodesplit_report(),
+                     model_nodesplit_sub = nodesplit_sub_report(),
+                     modelranfix = input$modelranfix,
+                     netgraph_label = list(label_all = input$label_all, label_excluded = input$label_excluded),
+                     outcome_measure = outcome_measure(),
+                     ranking = input$rankopts,
+                     # RankingData = RankingData(),
+                     # RankingData_sub = RankingData_sub(),
+                     reference_alter = reference_alter())
+      
+      # Knit the document, passing in the `params` list, and eval it in a child of the global environment 
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+    }
+  )
+  
+  #####
   # Reactive functions used in various places
   #####
   
@@ -130,6 +179,7 @@ shinyServer(function(input, output, session) {
   # Make data reactive i.e. default or user uploaded
   data <- reactive({ 
     file1 <- input$data # Name the data file that was uploaded file1
+
     # if a reload is triggered show the reload the file input and data
     if(reload()){
       output$file_input = default_file_input
@@ -137,6 +187,7 @@ shinyServer(function(input, output, session) {
     }
     # if data is triggered without reload, only load the default data
     else if(is.null(file1)){return(defaultD())      }
+
     else
       a <- read.table(file = file1$datapath, sep =",", header=TRUE, stringsAsFactors = FALSE, quote="\"", fileEncoding = 'UTF-8-BOM')
   })
@@ -667,9 +718,21 @@ shinyServer(function(input, output, session) {
                    outcome_measure(), input$modelranfix, reference_alter())
   })
   
+  # Create variable for report (so report works if button is clicked, or not)
+  model_report <- reactive({
+    if (input$baye_do == TRUE) {return(model())}
+    else {return(NA)}
+  })
+  
   model_sub <- eventReactive(input$sub_do, {
     bayesian_model(sub = TRUE, data(), treatment_list(), input$metaoutcome, input$exclusionbox, 
                    outcome_measure(), input$modelranfix, reference_alter())
+  })
+  
+  # Create variable for report (so report works if button is clicked, or not)
+  model_sub_report <- reactive({
+    if (input$sub_do == TRUE) {return(model_sub())}
+    else {return(NA)}
   })
 
   # 3a. Forest plot
@@ -869,6 +932,12 @@ shinyServer(function(input, output, session) {
     nodesplit(sub = FALSE, data(), treatment_list(), input$metaoutcome, outcome_measure(),
                     input$modelranfix, input$exclusionbox)
   })
+  
+  # Create variable for report
+  nodesplit_report <- reactive({
+    if (input$node == TRUE) {return(model_nodesplit())}
+    else {return(NA)}
+  })
 
   output$node_table<- renderTable(colnames=TRUE, {
     model_nodesplit()
@@ -879,7 +948,13 @@ shinyServer(function(input, output, session) {
     nodesplit(sub = TRUE, data(), treatment_list(), input$metaoutcome, outcome_measure(),
                     input$modelranfix, input$exclusionbox)
   })
-
+  
+  # Create variable for report
+  nodesplit_sub_report <- reactive({
+    if (input$node_sub == TRUE) {return(model_nodesplit_sub())}
+    else {return(NA)}
+  })
+    
   output$node_table_sub<- renderTable(colnames=TRUE, {
     model_nodesplit_sub()
   })
