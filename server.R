@@ -722,8 +722,6 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  
-  
   # Bayesian analysis
   
   model <- eventReactive(input$baye_do, {
